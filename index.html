@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Report: AI in Talent Attraction & Acquisition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+            background-color: #eef6f6; /* Grey-green */
+            color: #2a2c32; /* Charcoal Grey */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px;
+            max-height: 50vh;
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+        }
+        .nav-link.active {
+            color: #04677e; /* Self-made Teal */
+            border-bottom-color: #04677e; /* Self-made Teal */
+        }
+        .section {
+            display: none;
+        }
+        .section.active {
+            display: block;
+        }
+        .tool-card, .case-study-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .tool-card:hover, .case-study-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .filter-btn.active {
+            background-color: #04677e; /* Self-made Teal */
+            color: white;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #04677e; /* Self-made Teal */
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Custom Brand Colors */
+        .text-customer-teal { color: #0ba3ad; }
+        .bg-customer-teal { background-color: #0ba3ad; }
+        .border-customer-teal { border-color: #0ba3ad; }
+
+        .text-robin-egg-teal { color: #86c0c8; }
+        .bg-robin-egg-teal { background-color: #86c0c8; }
+
+        .text-grey-green { color: #eef6f6; }
+        .bg-grey-green { background-color: #eef6f6; }
+
+        .text-self-made-teal { color: #04677e; }
+        .bg-self-made-teal { background-color: #04677e; }
+        .hover\:bg-self-made-teal-darker:hover { background-color: #035266; } /* Slightly darker self-made teal for hover */
+
+        .text-coral-accent { color: #f2796d; }
+        .bg-coral-accent { background-color: #f2796d; }
+
+        .text-sunset { color: #f9c4c4; }
+        .bg-sunset { background-color: #f9c4c4; }
+
+        .text-charcoal-grey { color: #2a2c32; }
+
+        /* Modal specific styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+    </style>
+</head>
+<body class="bg-grey-green text-charcoal-grey">
+
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <header class="py-8 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold text-charcoal-grey tracking-tight">AI in Talent Attraction & Acquisition</h1>
+            <p class="mt-4 text-lg text-charcoal-grey max-w-3xl mx-auto">An interactive dashboard exploring the tools, impact, and strategy for transforming P&C with Artificial Intelligence.</p>
+        </header>
+
+        <nav class="sticky top-0 bg-grey-green/95 backdrop-blur-sm z-10 border-b border-gray-200 mb-8">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="flex justify-center space-x-4 sm:space-x-8">
+                    <a href="#overview" data-section="overview" class="nav-link active font-medium text-charcoal-grey hover:text-self-made-teal py-4 border-b-2 border-transparent">Overview</a>
+                    <a href="#industry-ai-platforms" data-section="industry-ai-platforms" class="nav-link font-medium text-charcoal-grey hover:text-self-made-teal py-4 border-b-2 border-transparent">Industry AI Platforms</a>
+                    <a href="#case-studies" data-section="case-studies" class="nav-link font-medium text-charcoal-grey hover:text-self-made-teal py-4 border-b-2 border-transparent">Case Studies</a>
+                    <a href="#roi-impact" data-section="roi-impact" class="nav-link font-medium text-charcoal-grey hover:text-self-made-teal py-4 border-b-2 border-transparent">ROI & Impact</a>
+                    <a href="#hands-on-ai-tools" data-section="hands-on-ai-tools" class="nav-link font-medium text-charcoal-grey hover:text-self-made-teal py-4 border-b-2 border-transparent">Hands-On AI Tools</a>
+                    <a href="#roadmap" data-section="roadmap" class="nav-link font-medium text-charcoal-grey hover:text-self-made-teal py-4 border-b-2 border-transparent">Strategic Roadmap</a>
+                </div>
+            </div>
+        </nav>
+
+        <main id="main-content">
+            
+            <section id="overview" class="section active fade-in">
+                <div class="max-w-4xl mx-auto">
+                    <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-200">
+                        <h2 class="text-3xl font-bold text-charcoal-grey mb-4">The Strategic Imperative of AI</h2>
+                        <p class="text-charcoal-grey mb-6">The landscape of talent acquisition is undergoing a profound transformation, driven by evolving candidate expectations, global competition for skills, and the demand for data-driven decisions. Artificial Intelligence is emerging not merely as a technological enhancement but as a strategic imperative, offering unprecedented capabilities to address these challenges. This interactive report explores how AI can revolutionize your People & Culture workflows, moving beyond automation to intelligent augmentation, enabling your team to focus on high-value, strategic activities.</p>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="bg-robin-egg-teal p-6 rounded-lg">
+                                <h3 class="font-semibold text-self-made-teal mb-2">General-Purpose AI</h3>
+                                <p class="text-charcoal-grey text-sm">Tools like <span class="font-bold">Google Gemini</span> and <span class="font-bold">ChatGPT</span> offer versatile, accessible capabilities for content generation, information synthesis, and basic data analysis. They are powerful, foundational components of an AI-driven HR strategy, ideal for daily operational tasks and strategic ideation.</p>
+                            </div>
+                            <div class="bg-sunset p-6 rounded-lg">
+                                <h3 class="font-semibold text-self-made-teal mb-2">Specialized AI Tools</h3>
+                                <p class="text-charcoal-grey text-sm">A robust ecosystem of tools like <span class="font-bold">Workable, Eightfold,</span> and <span class="font-bold">Paradox</span> are purpose-built for specific TA challenges. They leverage proprietary data and advanced algorithms for more precise, scalable, and compliant solutions in sourcing, interviewing, and marketing.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="industry-ai-platforms" class="section fade-in">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-charcoal-grey">Industry AI Platforms: Market Solutions</h2>
+                    <p class="mt-2 text-lg text-charcoal-grey max-w-2xl mx-auto">This section presents some of the popular specialized AI tools currently on the market, designed for various stages of the talent lifecycle.</p>
+                </div>
+                <div id="industry-tool-filters" class="flex flex-wrap justify-center gap-2 mb-8">
+                    <button class="industry-filter-btn active px-4 py-2 text-sm font-medium bg-white text-charcoal-grey rounded-full shadow-sm border border-gray-200 hover:bg-gray-100 transition" data-filter="all">All Platforms</button>
+                    <button class="industry-filter-btn px-4 py-2 text-sm font-medium bg-white text-charcoal-grey rounded-full shadow-sm border border-gray-200 hover:bg-gray-100 transition" data-filter="sourcing">Sourcing & Matching</button>
+                    <button class="industry-filter-btn px-4 py-2 text-sm font-medium bg-white text-charcoal-grey rounded-full shadow-sm border border-gray-200 hover:bg-gray-100 transition" data-filter="engagement">Engagement & CRM</button>
+                    <button class="industry-filter-btn px-4 py-2 text-sm font-medium bg-white text-charcoal-grey rounded-full shadow-sm border border-gray-200 hover:bg-gray-100 transition" data-filter="interviewing">Interviewing & Assessment</button>
+                    <button class="industry-filter-btn px-4 py-2 text-sm font-medium bg-white text-charcoal-grey rounded-full shadow-sm border border-gray-200 hover:bg-gray-100 transition" data-filter="branding">Marketing & Branding</button>
+                </div>
+                <div id="industry-tool-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Industry Platform cards will be rendered here by JS -->
+                </div>
+            </section>
+
+            <section id="case-studies" class="section fade-in">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-charcoal-grey">Case Studies: AI in Action</h2>
+                    <p class="mt-2 text-lg text-charcoal-grey max-w-2xl mx-auto">Explore real-world examples of how companies are leveraging AI to transform their Talent Acquisition operations and achieve measurable results. Click on a case study to reveal more details.</p>
+                </div>
+                <div id="case-study-grid-interactive" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Interactive Case Study cards will be rendered here by JS -->
+                </div>
+            </section>
+
+            <section id="roi-impact" class="section fade-in">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-charcoal-grey">Verifiable ROI & Impact</h2>
+                    <p class="mt-2 text-lg text-charcoal-grey max-w-2xl mx-auto">AI delivers quantifiable returns and qualitative benefits. Explore the data from real-world case studies to understand the true value of these technologies.</p>
+                </div>
+                <div class="grid lg:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                        <h3 class="text-xl font-bold text-charcoal-grey mb-4">Time-to-Hire Reductions</h3>
+                        <p class="text-charcoal-grey mb-4 text-sm">AI significantly accelerates hiring cycles by automating screening, scheduling, and sourcing.</p>
+                        <div class="chart-container">
+                            <canvas id="timeToHireChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                        <h3 class="text-xl font-bold text-charcoal-grey mb-4">Increased Diversity in Hiring</h3>
+                        <p class="text-charcoal-grey mb-4 text-sm">By reducing unconscious bias and optimizing language, AI helps build more diverse and inclusive teams.</p>
+                         <div class="chart-container">
+                            <canvas id="diversityChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                 <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-200 mt-8">
+                    <h3 class="text-2xl font-bold text-charcoal-grey mb-6 text-center">Key Case Study Highlights</h3>
+                    <div id="case-study-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    </div>
+                </div>
+            </section>
+
+            <section id="hands-on-ai-tools" class="section fade-in">
+                <div class="max-w-4xl mx-auto">
+                    <div class="text-center mb-12">
+                        <h2 class="text-3xl font-bold text-charcoal-grey">Hands-On AI Tools for TA Efforts</h2>
+                        <p class="mt-2 text-lg text-charcoal-grey max-w-2xl mx-auto">This section offers interactive tools powered by large language models like Google Gemini, which you can use directly to assist with various Talent Attraction & Acquisition tasks.</p>
+                    </div>
+
+                    <div id="hands-on-tool-filters" class="flex flex-wrap justify-center gap-2 mb-8">
+                        <button class="hands-on-filter-btn active px-4 py-2 text-sm font-medium bg-white text-charcoal-grey rounded-full shadow-sm border border-gray-200 hover:bg-gray-100 transition" data-filter="all">All Tools</button>
+                        <button class="hands-on-filter-btn px-4 py-2 text-sm font-medium bg-white text-charcoal-grey rounded-full shadow-sm border border-gray-200 hover:bg-gray-100 transition" data-filter="content-creation">Content Creation</button>
+                        <button class="hands-on-filter-btn px-4 py-2 text-sm font-medium bg-white text-charcoal-grey rounded-full shadow-sm border border-gray-200 hover:bg-gray-100 transition" data-filter="interviewing">Interviewing</button>
+                        <button class="hands-on-filter-btn px-4 py-2 text-sm font-medium bg-white text-charcoal-grey rounded-full shadow-sm border border-gray-200 hover:bg-gray-100 transition" data-filter="branding">Branding</button>
+                        <button class="hands-on-filter-btn px-4 py-2 text-sm font-medium bg-white text-charcoal-grey rounded-full shadow-sm border border-gray-200 hover:bg-gray-100 transition" data-filter="engagement">Engagement</button>
+                    </div>
+
+                    <div id="hands-on-tool-grid" class="grid md:grid-cols-2 gap-8">
+                        <!-- Hands-On AI Tool cards will be rendered here by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <section id="roadmap" class="section fade-in">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-charcoal-grey">Building Your AI-Ready P&C Strategy</h2>
+                    <p class="mt-2 text-lg text-charcoal-grey max-w-2xl mx-auto">A structured approach is necessary to successfully integrate AI. Follow this roadmap to assess your needs, implement tools, and measure success.</p>
+                </div>
+                <div class="relative max-w-5xl mx-auto">
+                    <div class="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-robin-egg-teal -translate-y-1/2"></div>
+                    <div class="grid md:grid-cols-4 gap-8 relative">
+                        <div class="roadmap-step text-center p-6 bg-white rounded-lg shadow-sm border border-gray-200">
+                            <div class="flex items-center justify-center w-12 h-12 rounded-full bg-robin-egg-teal text-self-made-teal font-bold text-xl mx-auto mb-4">1</div>
+                            <h3 class="font-semibold text-lg mb-2">Assess</h3>
+                            <p class="text-sm text-charcoal-grey">Audit current workflows to identify manual, repetitive tasks. Evaluate data readiness and pinpoint key challenges like time-to-hire or low diversity.</p>
+                        </div>
+                        <div class="roadmap-step text-center p-6 bg-white rounded-lg shadow-sm border border-gray-200">
+                            <div class="flex items-center justify-center w-12 h-12 rounded-full bg-robin-egg-teal text-self-made-teal font-bold text-xl mx-auto mb-4">2</div>
+                            <h3 class="font-semibold text-lg mb-2">Plan & Pilot</h3>
+                            <p class="text-sm text-charcoal-grey">Start with small, high-impact pilot projects. Select vendors with strong integration and bias mitigation. Allocate budget strategically.</p>
+                        </div>
+                        <div class="roadmap-step text-center p-6 bg-white rounded-lg shadow-sm border border-gray-200">
+                            <div class="flex items-center justify-center w-12 h-12 rounded-full bg-robin-egg-teal text-self-made-teal font-bold text-xl mx-auto mb-4">3</div>
+                            <h3 class="font-semibold text-lg mb-2">Implement & Train</h3>
+                            <p class="text-sm text-charcoal-grey">Roll out tools iteratively based on pilot learnings. Provide effective training and manage cultural change to ensure user adoption and success.</p>
+                        </div>
+                        <div class="roadmap-step text-center p-6 bg-white rounded-lg shadow-sm border border-gray-200">
+                            <div class="flex items-center justify-center w-12 h-12 rounded-full bg-robin-egg-teal text-self-made-teal font-bold text-xl mx-auto mb-4">4</div>
+                            <h3 class="font-semibold text-lg mb-2">Measure & Optimize</h3>
+                            <p class="text-sm text-charcoal-grey">Track quantitative (time-to-hire, cost) and qualitative (candidate satisfaction, quality of hire) metrics. Continuously review and optimize your AI strategy.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Case Study Modal Structure -->
+    <div id="caseStudyModalOverlay" class="modal-overlay hidden">
+        <div id="caseStudyModalContent" class="modal-content">
+            <button id="closeModalBtn" class="absolute top-4 right-4 text-charcoal-grey hover:text-self-made-teal text-2xl font-bold">&times;</button>
+            <h3 id="modalCompanyTool" class="text-2xl font-bold text-self-made-teal mb-2"></h3>
+            <p id="modalTopline" class="text-lg text-charcoal-grey mb-4"></p>
+            <div id="modalDetails" class="text-charcoal-grey text-base leading-relaxed"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // Data for market tools
+            const marketToolData = [
+                { name: 'Workable', category: 'sourcing', description: 'Proactively identifies ideal passive candidates and refines suggestions based on user decisions.', usp: 'Proprietary 400M+ candidate database, ethical AI practices.' },
+                { name: 'SeekOut', category: 'sourcing', description: 'Focuses on surfacing underrepresented and hard-to-find talent with advanced diversity filters.', usp: 'Access to 750M+ profiles and predicts who is likely open to new roles.' },
+                { name: 'Eightfold', category: 'sourcing', description: 'A talent intelligence platform for hiring, retention, and reskilling, using skills-based matching.', usp: 'Agentic AI that supports internal mobility and prevents bias via candidate masking.' },
+                { name: 'Paradox (Olivia)', category: 'engagement', description: 'A 24/7 conversational AI that engages, screens, and schedules candidates in real-time.', usp: 'Redefines high-volume hiring, drastically reducing time-to-hire.' },
+                { name: 'Beamery', category: 'engagement', description: 'A talent lifecycle platform for personalized marketing, candidate rediscovery, and pipeline prioritization.', usp: 'Agentic AI (Ray) that guides strategic talent decisions.' },
+                { name: 'HireVue', category: 'interviewing', description: 'AI-powered video interviews and assessments that analyze communication and behavioral cues.', usp: 'Brings structure and fairness to high-scale hiring, with proven bias reduction.' },
+                { name: 'Metaview.ai', category: 'interviewing', description: 'An "AI Scribe" that automatically transcribes interviews and pre-fills scorecards with evidence.', usp: 'Turns unstructured interview conversations into searchable, analyzable data.' },
+                { name: 'Textio', category: 'branding', description: 'Analyzes and optimizes language in job posts and recruiting materials to be more inclusive and engaging.', usp: 'Data-driven language analysis proven to attract more diverse applicants.' },
+                { name: 'Generative Engine Optimization (GEO)', category: 'branding', description: 'A strategy to manage a company\'s digital footprint to influence how AI summarizes its employer brand.', usp: 'Critical for managing brand perception in a "Zero Click" world.' },
+            ];
+
+            // Data for hands-on AI assistants
+            const aiAssistantData = [
+                { name: 'AI Content Generator', category: 'content-creation', description: 'Quickly draft content for employer branding, talent marketing, or candidate communications.', usp: 'Versatile content generation for various communication needs.', type: 'ai-content-generator' },
+                { name: 'Job Description Enhancer', category: 'content-creation', description: 'Enhance job descriptions for inclusivity, engagement, and diversity.', usp: 'Optimizes JD language for broader appeal and reduced bias.', type: 'ai-jd-enhancer' },
+                { name: 'Candidate Persona Generator', category: 'content-creation', description: 'Generate detailed candidate personas to better understand your target audience for talent attraction and marketing.', usp: 'Creates targeted candidate profiles for effective outreach.', type: 'ai-persona-generator' },
+                { name: 'Employer Brand Storyteller', category: 'content-creation', description: 'Generate compelling short narratives or taglines for your employer brand based on key cultural aspects or values.', usp: 'Crafts impactful brand messaging for talent attraction.', type: 'ai-brand-storyteller' },
+                { name: 'Interview Question Assistant', category: 'interviewing', description: 'Generate tailored interview questions based on job roles or specific skills.', usp: 'Streamlines interview preparation with relevant questions.', type: 'ai-interview-questions' },
+                { name: 'Interview Feedback Summarizer', category: 'interviewing', description: 'Summarize interview notes, highlight strengths/weaknesses, and extract action items.', usp: 'Converts raw notes into structured, actionable feedback.', type: 'ai-feedback-summarizer' },
+                { name: 'Social Media Content Brainstormer', category: 'branding', description: 'Generate creative social media post ideas for employer branding based on a topic.', usp: 'Sparks creativity for engaging social media campaigns.', type: 'ai-social-brainstormer' },
+                { name: 'Candidate Outreach Personalizer', category: 'engagement', description: 'Generate personalized outreach messages for candidates based on their profile and the role.', usp: 'Boosts candidate response rates with tailored communication.', type: 'ai-outreach-personalizer' }
+            ];
+
+            const caseStudyData = [
+                { 
+                    company: 'Multinational Org', tool: 'Eightfold', metric: 'Time-to-Hire Reduction', value: '40%', icon: '⏱️',
+                    topline: 'Reduced time-to-hire by 40% and recruitment costs by 30%.',
+                    details: 'A multinational organization using Eightfold\'s AI recruitment automation decreased time-to-hire by 40%, from an average of 60 days to 36 days. They also saved 30% in recruitment costs by reducing dependency on third-party recruitment agencies. Furthermore, they saw a 20% increase in women and underrepresented minorities within one year.'
+                },
+                { 
+                    company: 'Paradox Clients', tool: 'Paradox', metric: 'Cost per Hire Reduction', value: '54%', icon: '💰',
+                    topline: 'Saved $2M annually, increased scheduled interviews by 100%, and reduced cost per hire by 54%.',
+                    details: 'Paradox clients reported saving $2,000,000 with automated interview scheduling and 35,000 hours annually, while increasing scheduled interviews by 100%. They also helped decrease time-to-hire by 75% and lowered the average cost per hire by 54% with conversational AI.'
+                },
+                { 
+                    company: 'Co-operative Bank', tool: 'HireVue', metric: 'Bias Reduction', value: '90%', icon: '⚖️',
+                    topline: 'Achieved 90% reduction in bias and a 50/50 gender hiring split.',
+                    details: 'The Co-operative Bank reported a 90% reduction in bias and achieved a 50/50 gender hiring split using HireVue\'s AI video interviews. This demonstrates the platform\'s effectiveness in fostering fair and equitable hiring practices.'
+                },
+                { 
+                    company: 'T-Mobile', tool: 'Textio', metric: 'Increase in Women Applicants', value: '17%', icon: '👩‍💼',
+                    topline: 'Saw 17% more women applicants and 5 days faster time to fill.',
+                    details: 'T-Mobile utilized Textio to optimize their language in job posts, resulting in a 17% increase in women applicants and a 5-day faster time to fill. This highlights the power of inclusive language in attracting a diverse talent pool.'
+                },
+                { 
+                    company: 'Appian', tool: 'Beamery', metric: 'Sourcing Time Reduction', value: '75%', icon: '🔍',
+                    topline: 'Increased job applications and reduced sourcing time by 75%.',
+                    details: 'Appian successfully used Beamery to increase job applications and achieve a significant 75% reduction in sourcing time. This showcases Beamery\'s ability to streamline talent acquisition workflows and improve efficiency.'
+                },
+                { 
+                    company: 'Children\'s Hospital of Philadelphia', tool: 'HireVue', metric: 'Hours Saved Annually', value: '6,743', icon: '⏳',
+                    topline: 'Saved $667,000 and 6,743 hours by replacing phone screens.',
+                    details: 'Children\'s Hospital of Philadelphia realized substantial savings of $667,000 and 6,743 hours annually by replacing traditional phone screens with HireVue\'s AI-powered interview solutions, demonstrating significant operational efficiency.'
+                },
+                {
+                    company: 'Tata Communications', tool: 'Eightfold', metric: 'Qualified Female Hiring', value: '19%', icon: '📈',
+                    topline: 'Increased qualified female hiring by 19% using gender-masked profiles.',
+                    details: 'Tata Communications Limited achieved a 19% increase in qualified female hiring by leveraging Eightfold\'s gender-masked profiles, showcasing the platform\'s effectiveness in promoting diversity and reducing unconscious bias.'
+                },
+                {
+                    company: 'BMS', tool: 'Eightfold', metric: 'Time to Fill Reduction', value: '21%', icon: '⏱️',
+                    topline: 'Reduced time to fill by 21% in just 16 weeks and saved millions by redeploying employees.',
+                    details: 'BMS experienced a 21% reduction in time to fill within just 16 weeks after implementing Eightfold. Furthermore, they saved millions of dollars by strategically redeploying over 500 employees into new roles, retaining institutional knowledge and optimizing workforce planning.'
+                }
+            ];
+
+            const industryToolGrid = document.getElementById('industry-tool-grid');
+            const industryToolFilters = document.getElementById('industry-tool-filters');
+            const handsOnToolGrid = document.getElementById('hands-on-tool-grid');
+            const handsOnToolFilters = document.getElementById('hands-on-tool-filters');
+            const caseStudyGrid = document.getElementById('case-study-grid'); // For the ROI & Impact section's highlight
+            const interactiveCaseStudyGrid = document.getElementById('case-study-grid-interactive'); // For the new interactive section
+
+            // Modal Elements
+            const caseStudyModalOverlay = document.getElementById('caseStudyModalOverlay');
+            const caseStudyModalContent = document.getElementById('caseStudyModalContent');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            const modalCompanyTool = document.getElementById('modalCompanyTool');
+            const modalTopline = document.getElementById('modalTopline');
+            const modalDetails = document.getElementById('modalDetails');
+
+
+            async function callGeminiAPI(prompt, outputElement, spinnerElement) {
+                outputElement.textContent = ''; // Clear previous output
+                spinnerElement.classList.remove('hidden'); // Show spinner
+
+                let chatHistory = [];
+                chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                const payload = { contents: chatHistory };
+                const apiKey = ""; // Canvas will automatically provide this at runtime
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+                let retryCount = 0;
+                const maxRetries = 5;
+                let delay = 1000; // 1 second
+
+                while (retryCount < maxRetries) {
+                    try {
+                        const response = await fetch(apiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+
+                        if (!response.ok) {
+                            if (response.status === 429) { // Too Many Requests
+                                retryCount++;
+                                delay *= 2; // Exponential backoff
+                                await new Promise(res => setTimeout(res, delay));
+                                continue;
+                            } else {
+                                throw new Error(`API error: ${response.status} ${response.statusText}`);
+                            }
+                        }
+
+                        const result = await response.json();
+                        if (result.candidates && result.candidates.length > 0 &&
+                            result.candidates[0].content && result.candidates[0].content.parts &&
+                            result.candidates[0].content.parts.length > 0) {
+                            const text = result.candidates[0].content.parts[0].text;
+                            outputElement.textContent = text;
+                            return; // Success
+                        } else {
+                            outputElement.textContent = 'Error: No content generated or unexpected response structure.';
+                            return;
+                        }
+                    } catch (error) {
+                        outputElement.textContent = `Error: ${error.message}`;
+                        return;
+                    } finally {
+                        spinnerElement.classList.add('hidden'); // Hide spinner
+                    }
+                }
+                outputElement.textContent = 'Error: Max retries exceeded. Please try again later.';
+                spinnerElement.classList.add('hidden'); // Hide spinner
+            }
+
+            // Function to render MARKET tools (Industry AI Platforms)
+            function renderIndustryTools(filter = 'all') {
+                industryToolGrid.innerHTML = ''; // Clear previous tools
+                const filteredTools = filter === 'all' ? marketToolData : marketToolData.filter(tool => tool.category === filter);
+                
+                filteredTools.forEach(tool => {
+                    const card = document.createElement('div');
+                    card.className = 'tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex flex-col fade-in';
+                    card.innerHTML = `
+                        <h3 class="text-xl font-bold text-charcoal-grey mb-2">${tool.name}</h3>
+                        <p class="text-charcoal-grey text-sm mb-4 flex-grow">${tool.description}</p>
+                        <div class="mt-auto pt-4 border-t border-gray-100">
+                            <p class="text-sm font-semibold text-self-made-teal">Key Differentiator:</p>
+                            <p class="text-sm text-charcoal-grey">${tool.usp}</p>
+                        </div>
+                    `;
+                    industryToolGrid.appendChild(card);
+                });
+            }
+
+            // Function to render HANDS-ON AI tools
+            function renderHandsOnTools(filter = 'all') {
+                handsOnToolGrid.innerHTML = ''; // Clear previous tools
+                const filteredAssistants = filter === 'all' ? aiAssistantData : aiAssistantData.filter(assistant => assistant.category === filter);
+
+                filteredAssistants.forEach(tool => {
+                    const card = document.createElement('div');
+                    card.className = 'tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex flex-col fade-in';
+                    
+                    let innerHTMLContent = `<h3 class="text-xl font-bold text-charcoal-grey mb-2">✨ ${tool.name}</h3>
+                                            <p class="text-charcoal-grey text-sm mb-4 flex-grow">${tool.description}</p>`;
+                    let buttonId, spinnerId, outputId, inputId1, inputId2, resetButtonId, copyButtonId, copyConfirmId;
+
+                    // Generate unique IDs for elements within each dynamically created card
+                    const uniqueSuffix = tool.name.replace(/\s/g, '') + '_' + Math.random().toString(36).substr(2, 9);
+
+                    buttonId = `generateBtn_${uniqueSuffix}`;
+                    spinnerId = `spinner_${uniqueSuffix}`;
+                    outputId = `output_${uniqueSuffix}`;
+                    resetButtonId = `resetBtn_${uniqueSuffix}`;
+                    copyButtonId = `copyBtn_${uniqueSuffix}`;
+                    copyConfirmId = `copyConfirm_${uniqueSuffix}`;
+
+                    switch (tool.type) {
+                        case 'ai-content-generator':
+                            inputId1 = `contentPrompt_${uniqueSuffix}`;
+                            innerHTMLContent += `
+                                <div class="mb-4">
+                                    <label for="${inputId1}" class="block text-sm font-medium text-charcoal-grey mb-2">Your Content Request:</label>
+                                    <textarea id="${inputId1}" rows="4" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-self-made-teal focus:ring-self-made-teal sm:text-sm p-2" placeholder="e.g., 'Draft a LinkedIn post announcing a new referral bonus program for software engineers.'"></textarea>
+                                </div>
+                            `;
+                            break;
+                        case 'ai-jd-enhancer':
+                            inputId1 = `jdInput_${uniqueSuffix}`;
+                            innerHTMLContent += `
+                                <div class="mb-4">
+                                    <label for="${inputId1}" class="block text-sm font-medium text-charcoal-grey mb-2">Original Job Description:</label>
+                                    <textarea id="${inputId1}" rows="6" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-self-made-teal focus:ring-self-made-teal sm:text-sm p-2" placeholder="Paste your job description here..."></textarea>
+                                </div>
+                            `;
+                            break;
+                        case 'ai-persona-generator':
+                            inputId1 = `personaInput_${uniqueSuffix}`;
+                            innerHTMLContent += `
+                                <div class="mb-4">
+                                    <label for="${inputId1}" class="block text-sm font-medium text-charcoal-grey mb-2">Job Role or Candidate Type:</label>
+                                    <input type="text" id="${inputId1}" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-self-made-teal focus:ring-self-made-teal sm:text-sm p-2" placeholder="e.g., 'Entry-level Software Engineer', 'Experienced Marketing Manager'"/>
+                                </div>
+                            `;
+                            break;
+                        case 'ai-brand-storyteller':
+                            inputId1 = `brandKeywordsInput_${uniqueSuffix}`;
+                            innerHTMLContent += `
+                                <div class="mb-4">
+                                    <label for="${inputId1}" class="block text-sm font-medium text-charcoal-grey mb-2">Company Culture/Values Keywords:</label>
+                                    <input type="text" id="${inputId1}" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-self-made-teal focus:ring-self-made-teal sm:text-sm p-2" placeholder="e.g., 'Innovation, Collaboration, Impact, Growth'"/>
+                                </div>
+                            `;
+                            break;
+                        case 'ai-interview-questions':
+                            inputId1 = `jobSkillsInput_${uniqueSuffix}`;
+                            innerHTMLContent += `
+                                <div class="mb-4">
+                                    <label for="${inputId1}" class="block text-sm font-medium text-charcoal-grey mb-2">Job Title or Key Skills:</label>
+                                    <input type="text" id="${inputId1}" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-self-made-teal focus:ring-self-made-teal sm:text-sm p-2" placeholder="e.g., 'Senior Software Engineer, React, Node.js'"/>
+                                </div>
+                            `;
+                            break;
+                        case 'ai-feedback-summarizer':
+                            inputId1 = `interviewNotesInput_${uniqueSuffix}`;
+                            inputId2 = `interviewRoleContext_${uniqueSuffix}`;
+                            innerHTMLContent += `
+                                <div class="mb-4">
+                                    <label for="${inputId1}" class="block text-sm font-medium text-charcoal-grey mb-2">Interview Notes:</label>
+                                    <textarea id="${inputId1}" rows="4" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-self-made-teal focus:ring-self-made-teal sm:text-sm p-2" placeholder="Paste your interview notes here..."></textarea>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="${inputId2}" class="block text-sm font-medium text-charcoal-grey mb-2">Role/Context (Optional):</label>
+                                    <input type="text" id="${inputId2}" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-self-made-teal focus:ring-self-made-teal sm:text-sm p-2" placeholder="e.g., 'Software Engineer'"/>
+                                </div>
+                            `;
+                            break;
+                        case 'ai-social-brainstormer':
+                            inputId1 = `socialTopicInput_${uniqueSuffix}`;
+                            innerHTMLContent += `
+                                <div class="mb-4">
+                                    <label for="${inputId1}" class="block text-sm font-medium text-charcoal-grey mb-2">Topic for Social Media:</label>
+                                    <input type="text" id="${inputId1}" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-self-made-teal focus:ring-self-made-teal sm:text-sm p-2" placeholder="e.g., 'Company culture', 'New product launch', 'Employee success story'"/>
+                                </div>
+                            `;
+                            break;
+                        case 'ai-outreach-personalizer':
+                            inputId1 = `candidateProfileInput_${uniqueSuffix}`;
+                            inputId2 = `outreachRoleInput_${uniqueSuffix}`;
+                            innerHTMLContent += `
+                                <div class="mb-4">
+                                    <label for="${inputId1}" class="block text-sm font-medium text-charcoal-grey mb-2">Candidate Profile Summary:</label>
+                                    <textarea id="${inputId1}" rows="3" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-self-made-teal focus:ring-self-made-teal sm:text-sm p-2" placeholder="e.g., 'Experienced software engineer, passionate about open source, recently contributed to Project X.'"></textarea>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="${inputId2}" class="block text-sm font-medium text-charcoal-grey mb-2">Target Job Role:</label>
+                                    <input type="text" id="${inputId2}" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-self-made-teal focus:ring-self-made-teal sm:text-sm p-2" placeholder="e.g., 'Senior Full Stack Developer'"/>
+                                </div>
+                            `;
+                            break;
+                        default:
+                            innerHTMLContent += `<p class="text-red-500">Unknown AI tool type.</p>`;
+                    }
+
+                    innerHTMLContent += `
+                        <div class="flex items-center justify-between mt-auto pt-4 border-t border-gray-100">
+                            <div>
+                                <button id="${buttonId}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-self-made-teal hover:bg-self-made-teal-darker focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-self-made-teal">
+                                    Generate
+                                    <span id="${spinnerId}" class="spinner ml-2 hidden"></span>
+                                </button>
+                                <button id="${resetButtonId}" class="ml-2 inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-charcoal-grey bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-self-made-teal">
+                                    Reset
+                                </button>
+                            </div>
+                            <button id="${copyButtonId}" class="ml-auto inline-flex items-center px-3 py-1 border border-gray-300 text-xs font-medium rounded-md shadow-sm text-charcoal-grey bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-self-made-teal">
+                                Copy
+                            </button>
+                        </div>
+                        <div id="${copyConfirmId}" class="text-xs text-self-made-teal mt-2 text-right opacity-0 transition-opacity duration-300"></div>
+                        <div id="${outputId}" class="mt-6 p-4 bg-grey-green rounded-md border border-gray-200 text-charcoal-grey whitespace-pre-wrap text-sm min-h-[80px]">
+                            Generated content will appear here.
+                        </div>
+                    `;
+                    card.innerHTML = innerHTMLContent;
+                    handsOnToolGrid.appendChild(card); // Add to hands-on tool grid
+
+                    // Attach event listeners for dynamically created AI tool buttons
+                    const currentButton = document.getElementById(buttonId);
+                    const currentResetButton = document.getElementById(resetButtonId);
+                    const currentCopyButton = document.getElementById(copyButtonId);
+                    const currentOutput = document.getElementById(outputId);
+                    const currentSpinner = document.getElementById(spinnerId);
+                    const currentCopyConfirm = document.getElementById(copyConfirmId);
+
+                    if (currentButton) {
+                        currentButton.addEventListener('click', async () => {
+                            let promptText = '';
+                            let input1El = document.getElementById(inputId1);
+                            let input2El = inputId2 ? document.getElementById(inputId2) : null;
+
+                            if (!input1El || (input1El.value.trim() === '' && (!input2El || input2El.value.trim() === ''))) {
+                                currentOutput.textContent = 'Please provide input to generate content.';
+                                currentSpinner.classList.add('hidden');
+                                return;
+                            }
+
+                            switch (tool.type) {
+                                case 'ai-content-generator':
+                                    promptText = input1El.value.trim();
+                                    await callGeminiAPI(`Generate a professional and engaging piece of content based on the following request:\n\n"${promptText}"`, currentOutput, currentSpinner);
+                                    break;
+                                case 'ai-jd-enhancer':
+                                    promptText = input1El.value.trim();
+                                    await callGeminiAPI(`Rewrite the following job description to be more inclusive, engaging, and optimized for attracting diverse talent. Focus on clarity, appeal, and removing any potentially biased language. Keep the core requirements intact:\n\n"${promptText}"`, currentOutput, currentSpinner);
+                                    break;
+                                case 'ai-persona-generator':
+                                    promptText = input1El.value.trim();
+                                    await callGeminiAPI(`Generate a detailed candidate persona for a "${promptText}" role. Include demographics, motivations, pain points, and preferred communication channels. Structure it clearly.`, currentOutput, currentSpinner);
+                                    break;
+                                case 'ai-brand-storyteller':
+                                    promptText = input1El.value.trim();
+                                    await callGeminiAPI(`Generate 3-5 short, compelling employer brand narratives or taglines based on the following company culture/values keywords: "${promptText}". Focus on attracting top talent and highlighting unique aspects of the work environment.`, currentOutput, currentSpinner);
+                                    break;
+                                case 'ai-interview-questions':
+                                    promptText = input1El.value.trim();
+                                    await callGeminiAPI(`Generate 5-7 interview questions for a candidate with the following job title or skills: "${promptText}". Focus on behavioral and technical aspects relevant to the role.`, currentOutput, currentSpinner);
+                                    break;
+                                case 'ai-feedback-summarizer':
+                                    const notes = input1El.value.trim();
+                                    const roleContext = input2El.value.trim();
+                                    let fullPrompt = `Summarize the following interview notes, highlighting the candidate's key strengths and weaknesses relevant to the role. Also, extract any clear action items or next steps mentioned.`;
+                                    if (roleContext) {
+                                        fullPrompt += ` The role is for a "${roleContext}".`;
+                                    }
+                                    fullPrompt += `\n\nInterview Notes: "${notes}"`;
+                                    await callGeminiAPI(fullPrompt, currentOutput, currentSpinner);
+                                    break;
+                                case 'ai-social-brainstormer':
+                                    promptText = input1El.value.trim();
+                                    await callGeminiAPI(`Brainstorm 3-5 creative social media post ideas (e.g., for LinkedIn, Instagram) for employer branding purposes, focusing on the topic: "${promptText}". Include a brief description for each idea.`, currentOutput, currentSpinner);
+                                    break;
+                                case 'ai-outreach-personalizer':
+                                    const profileSummary = input1El.value.trim();
+                                    const targetRole = input2El.value.trim();
+                                    await callGeminiAPI(`Draft a personalized outreach message for a candidate with the following profile summary: "${profileSummary}". The message should be for the role of "${targetRole}". Make it engaging, highlight why their profile is a good fit, and include a clear call to action.`, currentOutput, currentSpinner);
+                                    break;
+                            }
+                        });
+                    }
+
+                    if (currentResetButton) {
+                        currentResetButton.addEventListener('click', () => {
+                            let input1El = document.getElementById(inputId1);
+                            let input2El = inputId2 ? document.getElementById(inputId2) : null;
+                            if (input1El) input1El.value = '';
+                            if (input2El) input2El.value = '';
+                            currentOutput.textContent = 'Generated content will appear here.';
+                            currentSpinner.classList.add('hidden');
+                            currentCopyConfirm.textContent = '';
+                            currentCopyConfirm.classList.add('opacity-0');
+                        });
+                    }
+
+                    if (currentCopyButton) {
+                        currentCopyButton.addEventListener('click', () => {
+                            const textToCopy = currentOutput.textContent;
+                            if (textToCopy && textToCopy !== 'Generated content will appear here.' && !currentSpinner.classList.contains('hidden')) {
+                                try {
+                                    // Use execCommand for broader compatibility in iframes
+                                    const textarea = document.createElement('textarea');
+                                    textarea.value = textToCopy;
+                                    document.body.appendChild(textarea);
+                                    textarea.select();
+                                    document.execCommand('copy');
+                                    document.body.removeChild(textarea);
+
+                                    currentCopyConfirm.textContent = 'Copied!';
+                                    currentCopyConfirm.classList.remove('opacity-0');
+                                    setTimeout(() => {
+                                        currentCopyConfirm.classList.add('opacity-0');
+                                    }, 2000);
+                                } catch (err) {
+                                    console.error('Failed to copy text: ', err);
+                                    currentCopyConfirm.textContent = 'Copy failed!';
+                                    currentCopyConfirm.classList.remove('opacity-0');
+                                    setTimeout(() => {
+                                        currentCopyConfirm.classList.add('opacity-0');
+                                    }, 2000);
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+
+            function renderCaseStudiesHighlights() {
+                caseStudyGrid.innerHTML = '';
+                caseStudyData.forEach(study => {
+                    const card = document.createElement('div');
+                    card.className = 'bg-gray-100 p-4 rounded-lg text-center';
+                    card.innerHTML = `
+                        <div class="text-4xl mb-2">${study.icon}</div>
+                        <p class="text-2xl font-bold text-self-made-teal">${study.value}</p>
+                        <p class="text-sm text-charcoal-grey font-medium mt-1">${study.metric}</p>
+                        <p class="text-xs text-charcoal-grey mt-2">via ${study.tool} for ${study.company}</p>
+                    `;
+                    caseStudyGrid.appendChild(card);
+                });
+            }
+
+            function renderInteractiveCaseStudies() {
+                interactiveCaseStudyGrid.innerHTML = '';
+                caseStudyData.forEach((study, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'case-study-card bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex flex-col cursor-pointer';
+                    card.dataset.index = index; // Store index to retrieve full details
+
+                    card.innerHTML = `
+                        <h3 class="text-xl font-bold text-charcoal-grey mb-2">${study.company}</h3>
+                        <p class="text-self-made-teal text-sm font-semibold mb-2">${study.tool} - ${study.metric}: ${study.value}</p>
+                        <p class="text-charcoal-grey text-sm flex-grow">${study.topline}</p>
+                        <button class="mt-4 px-4 py-2 bg-self-made-teal text-white rounded-md shadow-sm hover:bg-self-made-teal-darker transition view-details-btn" data-index="${index}">View Details</button>
+                    `;
+                    interactiveCaseStudyGrid.appendChild(card);
+
+                    // Attach event listener to the "View Details" button
+                    card.querySelector('.view-details-btn').addEventListener('click', function() {
+                        const studyIndex = parseInt(this.dataset.index);
+                        const study = caseStudyData[studyIndex];
+                        
+                        modalCompanyTool.textContent = `${study.company} (${study.tool})`;
+                        modalTopline.textContent = study.topline;
+                        modalDetails.textContent = study.details; // Use textContent to prevent HTML injection
+
+                        caseStudyModalOverlay.classList.remove('hidden'); // Ensure it's not hidden
+                        caseStudyModalOverlay.classList.add('active');
+                    });
+                });
+            }
+
+            // Close modal event listeners
+            closeModalBtn.addEventListener('click', () => {
+                caseStudyModalOverlay.classList.remove('active');
+                caseStudyModalOverlay.classList.add('hidden'); // Hide it completely
+            });
+
+            caseStudyModalOverlay.addEventListener('click', (e) => {
+                if (e.target === caseStudyModalOverlay) { // Only close if clicking on the overlay itself, not the content
+                    caseStudyModalOverlay.classList.remove('active');
+                    caseStudyModalOverlay.classList.add('hidden'); // Hide it completely
+                }
+            });
+
+
+            // Event listener for Industry AI Platforms filters
+            industryToolFilters.addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    document.querySelector('#industry-tool-filters .industry-filter-btn.active').classList.remove('active');
+                    e.target.classList.add('active');
+                    renderIndustryTools(e.target.dataset.filter);
+                }
+            });
+
+            // Event listener for Hands-On AI Tools filters
+            handsOnToolFilters.addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    document.querySelector('#hands-on-tool-filters .hands-on-filter-btn.active').classList.remove('active');
+                    e.target.classList.add('active');
+                    renderHandsOnTools(e.target.dataset.filter);
+                }
+            });
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('.section');
+
+            function switchSection(sectionId) {
+                navLinks.forEach(link => {
+                    link.classList.toggle('active', link.dataset.section === sectionId);
+                });
+                sections.forEach(section => {
+                    section.classList.toggle('active', section.id === sectionId);
+                });
+                
+                // Render tools based on the active section
+                if (sectionId === 'industry-ai-platforms') {
+                    const allToolsFilterBtn = document.querySelector('#industry-tool-filters button[data-filter="all"]');
+                    if (allToolsFilterBtn && !allToolsFilterBtn.classList.contains('active')) {
+                        document.querySelector('#industry-tool-filters .industry-filter-btn.active').classList.remove('active');
+                        allToolsFilterBtn.classList.add('active');
+                    }
+                    renderIndustryTools('all');
+                } else if (sectionId === 'hands-on-ai-tools') {
+                    const allToolsFilterBtn = document.querySelector('#hands-on-tool-filters button[data-filter="all"]');
+                    if (allToolsFilterBtn && !allToolsFilterBtn.classList.contains('active')) {
+                        document.querySelector('#hands-on-tool-filters .hands-on-filter-btn.active').classList.remove('active');
+                        allToolsFilterBtn.classList.add('active');
+                    }
+                    renderHandsOnTools('all');
+                } else if (sectionId === 'case-studies') {
+                    renderInteractiveCaseStudies();
+                }
+            }
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const sectionId = e.target.dataset.section;
+                    switchSection(sectionId);
+                    window.history.pushState({section: sectionId}, '', `#${sectionId}`);
+                });
+            });
+
+            window.addEventListener('popstate', (e) => {
+                if (e.state && e.state.section) {
+                    switchSection(e.state.section);
+                } else {
+                    switchSection('overview');
+                }
+            });
+
+            function createChart(ctx, type, labels, data, label, backgroundColor, borderColor) {
+                return new Chart(ctx, {
+                    type: type,
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: label,
+                            data: data,
+                            backgroundColor: backgroundColor,
+                            borderColor: borderColor,
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: '#e5e7eb'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed.y !== null) {
+                                            label += context.parsed.y + '%';
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            const timeToHireCtx = document.getElementById('timeToHireChart').getContext('2d');
+            createChart(timeToHireCtx, 'bar', 
+                ['Multinational Org (Eightfold)', 'Paradox Clients (Paradox)', 'Great Southern Bank (HireVue)', 'SmartLynx Airlines (HireVue)'], 
+                [40, 75, 43, 83], 
+                'Time-to-Hire Reduction (%)',
+                'rgba(11, 163, 173, 0.6)', /* Customer Teal */ 'rgba(11, 163, 173, 1)'
+            );
+
+            const diversityCtx = document.getElementById('diversityChart').getContext('2d');
+            createChart(diversityCtx, 'bar',
+                ['Tata Communications (Eightfold)', 'T-Mobile (Textio)', 'Zillow Group (Textio)', 'Multinational Org (Eightfold)'],
+                [19, 17, 12, 20],
+                'Increase in Women/URM Hires (%)',
+                'rgba(242, 121, 109, 0.6)', /* Coral */ 'rgba(242, 121, 109, 1)'
+            );
+            
+            const initialSection = window.location.hash.substring(1) || 'overview';
+            switchSection(initialSection);
+
+            // Initial render of tools when the page loads
+            renderIndustryTools('all'); // Render market tools by default
+            renderHandsOnTools('all'); // Render hands-on tools by default (they are in a hidden section until navigated to)
+            renderCaseStudiesHighlights(); // Render highlights for ROI & Impact section
+            renderInteractiveCaseStudies(); // Render for the new Case Studies section
+        });
+    </script>
+</body>
+</html>
