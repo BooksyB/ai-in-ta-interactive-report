@@ -29,8 +29,8 @@
             transition: all 0.3s ease;
         }
         .nav-link.active {
-            color: #04677e; /* Self-made Teal */
-            border-bottom-color: #04677e; /* Self-made Teal */
+            color: #86c0c8; /* Robin's Egg Teal */
+            border-bottom-color: #86c0c8; /* Robin's Egg Teal */
         }
         .section {
             display: none;
@@ -40,6 +40,7 @@
         }
         .tool-card, .case-study-card {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-color: #86c0c8; /* Robin's Egg Teal for card borders */
         }
         .tool-card:hover, .case-study-card:hover {
             transform: translateY(-5px);
@@ -101,11 +102,11 @@
             background-color: rgba(0, 0, 0, 0.6);
             display: flex;
             align-items: center;
-            justify-center;
+            justify-content: center;
             z-index: 1000;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.3s ease; /* Smooth fade for overlay */
         }
         .modal-overlay.active {
             opacity: 1;
@@ -120,11 +121,51 @@
             max-height: 90vh;
             overflow-y: auto;
             position: relative;
-            transform: scale(0.95);
-            transition: transform 0.3s ease;
+            transform: scale(0.95); /* Initial smaller size */
+            opacity: 0; /* Initial hidden state for content */
+            transition: transform 0.3s ease, opacity 0.3s ease; /* Smooth scale and fade for content */
         }
         .modal-overlay.active .modal-content {
-            transform: scale(1);
+            transform: scale(1); /* Scale to full size */
+            opacity: 1; /* Fade in */
+        }
+        .list-bullet-color li::before {
+            content: "•";
+            color: #04677e; /* Self-made Teal */
+            display: inline-block;
+            width: 1em;
+            margin-left: -1em;
+        }
+
+        /* Scroll Indicator */
+        #scroll-indicator {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(4, 103, 126, 0.8); /* Self-made Teal with transparency */
+            color: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        #scroll-indicator.visible {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(-50%) translateY(0);
+        }
+        #scroll-indicator.hidden-at-bottom {
+            opacity: 0;
+            transform: translateX(-50%) translateY(20px); /* Move down slightly as it fades */
         }
     </style>
 </head>
@@ -132,20 +173,25 @@
 
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
         
-        <header class="py-8 text-center">
-            <h1 class="text-4xl md:text-5xl font-bold text-charcoal-grey tracking-tight">AI in Talent Attraction & Acquisition</h1>
-            <p class="mt-4 text-lg text-charcoal-grey max-w-3xl mx-auto">An interactive dashboard exploring the tools, impact, and strategy for transforming P&C with Artificial Intelligence.</p>
+        <header class="py-4 text-center bg-self-made-teal shadow-md rounded-b-lg">
+            <div class="flex flex-col items-center justify-center">
+                <!-- Booksy Logo - Watermark: Cannot be removed as it's part of the provided image. -->
+                <!-- Please replace 'https://placehold.co/120x40/04677e/2a2c32?text=booksy' with the actual hosted URL of your Booksy logo. -->
+                <img src="https://placehold.co/120x40/04677e/2a2c32?text=booksy" alt="Booksy Logo" class="h-10 mb-2">
+                <h1 class="text-3xl md:text-4xl font-bold text-white tracking-tight leading-tight">AI in Talent<br>Attraction & Acquisition</h1>
+                <p class="mt-2 text-lg text-white max-w-3xl mx-auto">An interactive report and dashboard for P&C.</p>
+            </div>
         </header>
 
-        <nav class="sticky top-0 bg-grey-green/95 backdrop-blur-sm z-10 border-b border-gray-200 mb-8">
+        <nav class="sticky top-0 bg-self-made-teal/95 backdrop-blur-sm z-10 border-b border-gray-200 mb-8 shadow-md rounded-b-lg">
             <div class="max-w-7xl mx-auto px-4">
-                <div class="flex justify-center space-x-4 sm:space-x-8">
-                    <a href="#overview" data-section="overview" class="nav-link active font-medium text-charcoal-grey hover:text-self-made-teal py-4 border-b-2 border-transparent">Overview</a>
-                    <a href="#industry-ai-platforms" data-section="industry-ai-platforms" class="nav-link font-medium text-charcoal-grey hover:text-self-made-teal py-4 border-b-2 border-transparent">Industry AI Platforms</a>
-                    <a href="#case-studies" data-section="case-studies" class="nav-link font-medium text-charcoal-grey hover:text-self-made-teal py-4 border-b-2 border-transparent">Case Studies</a>
-                    <a href="#roi-impact" data-section="roi-impact" class="nav-link font-medium text-charcoal-grey hover:text-self-made-teal py-4 border-b-2 border-transparent">ROI & Impact</a>
-                    <a href="#hands-on-ai-tools" data-section="hands-on-ai-tools" class="nav-link font-medium text-charcoal-grey hover:text-self-made-teal py-4 border-b-2 border-transparent">Hands-On AI Tools</a>
-                    <a href="#roadmap" data-section="roadmap" class="nav-link font-medium text-charcoal-grey hover:text-self-made-teal py-4 border-b-2 border-transparent">Strategic Roadmap</a>
+                <div class="flex flex-wrap justify-center space-x-2 sm:space-x-4 md:space-x-8">
+                    <a href="#overview" data-section="overview" class="nav-link active font-medium text-charcoal-grey hover:text-robin-egg-teal py-4 border-b-2 border-transparent">Overview</a>
+                    <a href="#industry-ai-platforms" data-section="industry-ai-platforms" class="nav-link font-medium text-charcoal-grey hover:text-robin-egg-teal py-4 border-b-2 border-transparent">Industry AI Platforms</a>
+                    <a href="#case-studies" data-section="case-studies" class="nav-link font-medium text-charcoal-grey hover:text-robin-egg-teal py-4 border-b-2 border-transparent">Case Studies</a>
+                    <a href="#roi-impact" data-section="roi-impact" class="nav-link font-medium text-charcoal-grey hover:text-robin-egg-teal py-4 border-b-2 border-transparent">ROI & Impact</a>
+                    <a href="#hands-on-ai-tools" data-section="hands-on-ai-tools" class="nav-link font-medium text-charcoal-grey hover:text-robin-egg-teal py-4 border-b-2 border-transparent">Hands-On AI Tools</a>
+                    <a href="#roadmap" data-section="roadmap" class="nav-link font-medium text-charcoal-grey hover:text-robin-egg-teal py-4 border-b-2 border-transparent">Strategic Roadmap</a>
                 </div>
             </div>
         </nav>
@@ -154,7 +200,7 @@
             
             <section id="overview" class="section active fade-in">
                 <div class="max-w-4xl mx-auto">
-                    <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-200">
+                    <div class="bg-white p-8 rounded-xl shadow-sm border border-robin-egg-teal">
                         <h2 class="text-3xl font-bold text-charcoal-grey mb-4">The Strategic Imperative of AI</h2>
                         <p class="text-charcoal-grey mb-6">The landscape of talent acquisition is undergoing a profound transformation, driven by evolving candidate expectations, global competition for skills, and the demand for data-driven decisions. Artificial Intelligence is emerging not merely as a technological enhancement but as a strategic imperative, offering unprecedented capabilities to address these challenges. This interactive report explores how AI can revolutionize your People & Culture workflows, moving beyond automation to intelligent augmentation, enabling your team to focus on high-value, strategic activities.</p>
                         <div class="grid md:grid-cols-2 gap-6">
@@ -166,6 +212,22 @@
                                 <h3 class="font-semibold text-self-made-teal mb-2">Specialized AI Tools</h3>
                                 <p class="text-charcoal-grey text-sm">A robust ecosystem of tools like <span class="font-bold">Workable, Eightfold,</span> and <span class="font-bold">Paradox</span> are purpose-built for specific TA challenges. They leverage proprietary data and advanced algorithms for more precise, scalable, and compliant solutions in sourcing, interviewing, and marketing.</p>
                             </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-8 rounded-xl shadow-sm border border-robin-egg-teal mt-8">
+                        <h2 class="text-2xl font-bold text-charcoal-grey mb-4">✨ AI-Powered "Ask the Expert"</h2>
+                        <p class="text-charcoal-grey mb-4 text-sm">Have a question about AI in Talent Acquisition? Ask our AI expert for a quick, informed response.</p>
+                        <div class="mb-4">
+                            <label for="expertQuestionInput" class="block text-sm font-medium text-charcoal-grey mb-2">Your Question:</label>
+                            <textarea id="expertQuestionInput" rows="3" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-self-made-teal focus:ring-self-made-teal sm:text-sm p-2" placeholder="e.g., 'What are the main ethical considerations for using AI in candidate screening?'"></textarea>
+                        </div>
+                        <button id="askExpertBtn" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-self-made-teal hover:bg-self-made-teal-darker focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-self-made-teal">
+                            Ask Question
+                            <span id="expertSpinner" class="spinner ml-2 hidden"></span>
+                        </button>
+                        <div id="expertAnswerOutput" class="mt-6 p-4 bg-grey-green rounded-md border border-gray-200 text-charcoal-grey whitespace-pre-wrap">
+                            AI expert's answer will appear here.
                         </div>
                     </div>
                 </div>
@@ -204,14 +266,14 @@
                     <p class="mt-2 text-lg text-charcoal-grey max-w-2xl mx-auto">AI delivers quantifiable returns and qualitative benefits. Explore the data from real-world case studies to understand the true value of these technologies.</p>
                 </div>
                 <div class="grid lg:grid-cols-2 gap-8">
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-robin-egg-teal">
                         <h3 class="text-xl font-bold text-charcoal-grey mb-4">Time-to-Hire Reductions</h3>
                         <p class="text-charcoal-grey mb-4 text-sm">AI significantly accelerates hiring cycles by automating screening, scheduling, and sourcing.</p>
                         <div class="chart-container">
                             <canvas id="timeToHireChart"></canvas>
                         </div>
                     </div>
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-robin-egg-teal">
                         <h3 class="text-xl font-bold text-charcoal-grey mb-4">Increased Diversity in Hiring</h3>
                         <p class="text-charcoal-grey mb-4 text-sm">By reducing unconscious bias and optimizing language, AI helps build more diverse and inclusive teams.</p>
                          <div class="chart-container">
@@ -219,7 +281,7 @@
                         </div>
                     </div>
                 </div>
-                 <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-200 mt-8">
+                 <div class="bg-white p-8 rounded-xl shadow-sm border border-robin-egg-teal mt-8">
                     <h3 class="text-2xl font-bold text-charcoal-grey mb-6 text-center">Key Case Study Highlights</h3>
                     <div id="case-study-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                     </div>
@@ -239,6 +301,7 @@
                         <button class="hands-on-filter-btn px-4 py-2 text-sm font-medium bg-white text-charcoal-grey rounded-full shadow-sm border border-gray-200 hover:bg-gray-100 transition" data-filter="interviewing">Interviewing</button>
                         <button class="hands-on-filter-btn px-4 py-2 text-sm font-medium bg-white text-charcoal-grey rounded-full shadow-sm border border-gray-200 hover:bg-gray-100 transition" data-filter="branding">Branding</button>
                         <button class="hands-on-filter-btn px-4 py-2 text-sm font-medium bg-white text-charcoal-grey rounded-full shadow-sm border border-gray-200 hover:bg-gray-100 transition" data-filter="engagement">Engagement</button>
+                        <button class="hands-on-filter-btn px-4 py-2 text-sm font-medium bg-white text-charcoal-grey rounded-full shadow-sm border border-gray-200 hover:bg-gray-100 transition" data-filter="market-insights">Market Insights</button>
                     </div>
 
                     <div id="hands-on-tool-grid" class="grid md:grid-cols-2 gap-8">
@@ -255,32 +318,122 @@
                 <div class="relative max-w-5xl mx-auto">
                     <div class="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-robin-egg-teal -translate-y-1/2"></div>
                     <div class="grid md:grid-cols-4 gap-8 relative">
-                        <div class="roadmap-step text-center p-6 bg-white rounded-lg shadow-sm border border-gray-200">
+                        <div class="roadmap-step text-center p-6 bg-white rounded-lg shadow-sm border border-robin-egg-teal">
                             <div class="flex items-center justify-center w-12 h-12 rounded-full bg-robin-egg-teal text-self-made-teal font-bold text-xl mx-auto mb-4">1</div>
                             <h3 class="font-semibold text-lg mb-2">Assess</h3>
                             <p class="text-sm text-charcoal-grey">Audit current workflows to identify manual, repetitive tasks. Evaluate data readiness and pinpoint key challenges like time-to-hire or low diversity.</p>
                         </div>
-                        <div class="roadmap-step text-center p-6 bg-white rounded-lg shadow-sm border border-gray-200">
+                        <div class="roadmap-step text-center p-6 bg-white rounded-lg shadow-sm border border-robin-egg-teal">
                             <div class="flex items-center justify-center w-12 h-12 rounded-full bg-robin-egg-teal text-self-made-teal font-bold text-xl mx-auto mb-4">2</div>
                             <h3 class="font-semibold text-lg mb-2">Plan & Pilot</h3>
                             <p class="text-sm text-charcoal-grey">Start with small, high-impact pilot projects. Select vendors with strong integration and bias mitigation. Allocate budget strategically.</p>
                         </div>
-                        <div class="roadmap-step text-center p-6 bg-white rounded-lg shadow-sm border border-gray-200">
+                        <div class="roadmap-step text-center p-6 bg-white rounded-lg shadow-sm border border-robin-egg-teal">
                             <div class="flex items-center justify-center w-12 h-12 rounded-full bg-robin-egg-teal text-self-made-teal font-bold text-xl mx-auto mb-4">3</div>
                             <h3 class="font-semibold text-lg mb-2">Implement & Train</h3>
                             <p class="text-sm text-charcoal-grey">Roll out tools iteratively based on pilot learnings. Provide effective training and manage cultural change to ensure user adoption and success.</p>
                         </div>
-                        <div class="roadmap-step text-center p-6 bg-white rounded-lg shadow-sm border border-gray-200">
+                        <div class="roadmap-step text-center p-6 bg-white rounded-lg shadow-sm border border-robin-egg-teal">
                             <div class="flex items-center justify-center w-12 h-12 rounded-full bg-robin-egg-teal text-self-made-teal font-bold text-xl mx-auto mb-4">4</div>
                             <h3 class="font-semibold text-lg mb-2">Measure & Optimize</h3>
                             <p class="text-sm text-charcoal-grey">Track quantitative (time-to-hire, cost) and qualitative (candidate satisfaction, quality of hire) metrics. Continuously review and optimize your AI strategy.</p>
                         </div>
                     </div>
                 </div>
+
+                <div class="bg-white p-8 rounded-xl shadow-sm border border-robin-egg-teal mt-8">
+                    <h2 class="text-2xl font-bold text-charcoal-grey mb-4">✨ AI Readiness Assessment Quiz</h2>
+                    <p class="text-charcoal-grey mb-4 text-sm">Answer a few questions to get a personalized assessment of your organization's AI readiness and recommended next steps.</p>
+                    
+                    <div class="mb-6">
+                        <label for="dataMaturity" class="block text-sm font-medium text-charcoal-grey mb-2">1. How would you describe your organization's data maturity for HR/TA?</label>
+                        <select id="dataMaturity" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-self-made-teal focus:ring-self-made-teal sm:text-sm p-2">
+                            <option value="">Select an option</option>
+                            <option value="low">Low (Data silos, inconsistent data, manual reporting)</option>
+                            <option value="medium">Medium (Some structured data, basic reporting, limited analytics)</option>
+                            <option value="high">High (Well-structured data, advanced analytics, data-driven decisions)</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-6">
+                        <label for="techStackIntegration" class="block text-sm font-medium text-charcoal-grey mb-2">2. How integrated is your current HR/TA tech stack (ATS, HRIS, CRM)?</label>
+                        <select id="techStackIntegration" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-self-made-teal focus:ring-self-made-teal sm:text-sm p-2">
+                            <option value="">Select an option</option>
+                            <option value="low">Low (Many disparate systems, manual data transfer)</option>
+                            <option value="medium">Medium (Some integrations, but still manual gaps)</option>
+                            <option value="high">High (Seamless integrations, unified data flow)</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-6">
+                        <label for="orgCulture" class="block text-sm font-medium text-charcoal-grey mb-2">3. How open is your organizational culture to adopting new AI technologies?</label>
+                        <select id="orgCulture" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-self-made-teal focus:ring-self-made-teal sm:text-sm p-2">
+                            <option value="">Select an option</option>
+                            <option value="resistant">Resistant (Skepticism, fear of job displacement)</option>
+                            <option value="neutral">Neutral (Cautious, open to evidence)</option>
+                            <option value="eager">Eager (Embracing innovation, proactive exploration)</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-6">
+                        <label for="topChallenge" class="block text-sm font-medium text-charcoal-grey mb-2">4. What is your top talent acquisition challenge?</label>
+                        <input type="text" id="topChallenge" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-self-made-teal focus:ring-self-made-teal sm:text-sm p-2" placeholder="e.g., 'Sourcing diverse talent', 'Reducing time-to-hire', 'Improving candidate experience'"/>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <button id="getReadinessAssessmentBtn" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-self-made-teal hover:bg-self-made-teal-darker focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-self-made-teal">
+                            Get My AI Readiness Assessment
+                            <span id="readinessSpinner" class="spinner ml-2 hidden"></span>
+                        </button>
+                        <button id="resetReadinessQuizBtn" class="ml-2 inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-charcoal-grey bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-self-made-teal">
+                            Reset Quiz
+                        </button>
+                    </div>
+                    <div id="readinessAssessmentOutput" class="mt-6 p-4 bg-grey-green rounded-md border border-gray-200 text-charcoal-grey whitespace-pre-wrap text-sm min-h-[80px]">
+                        Your personalized AI readiness assessment will appear here.
+                    </div>
+                </div>
+                
+                <div class="bg-white p-8 rounded-xl shadow-sm border border-robin-egg-teal mt-8">
+                    <h2 class="text-2xl font-bold text-charcoal-grey mb-4">✨ Personalized AI Roadmap Generator</h2>
+                    <p class="text-charcoal-grey mb-4 text-sm">Input details about your organization to receive a tailored, phased AI implementation roadmap.</p>
+                    <div class="mb-4">
+                        <label for="teamSizeInput" class="block text-sm font-medium text-charcoal-grey mb-2">Current Team Size:</label>
+                        <input type="text" id="teamSizeInput" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-self-made-teal focus:ring-self-made-teal sm:text-sm p-2" placeholder="e.g., '50-100 employees', '250 TA team members'"/>
+                    </div>
+                    <div class="mb-4">
+                        <label for="budgetInput" class="block text-sm font-medium text-charcoal-grey mb-2">Approximate Budget for New Tech:</label>
+                        <select id="budgetInput" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-self-made-teal focus:ring-self-made-teal sm:text-sm p-2">
+                            <option value="">Select budget level</option>
+                            <option value="small">Small (pilot projects, free tools)</option>
+                            <option value="medium">Medium (some paid tools, limited integrations)</option>
+                            <option value="large">Large (enterprise solutions, extensive integrations)</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label for="painPointsInput" class="block text-sm font-medium text-charcoal-grey mb-2">Top 2-3 Talent Acquisition Pain Points:</label>
+                        <textarea id="painPointsInput" rows="3" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-self-made-teal focus:ring-self-made-teal sm:text-sm p-2" placeholder="e.g., 'Long time-to-hire, low candidate response rates, lack of diversity in pipeline'"></textarea>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <button id="generateRoadmapBtn" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-self-made-teal hover:bg-self-made-teal-darker focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-self-made-teal">
+                            Generate Personalized Roadmap
+                            <span id="roadmapSpinner" class="spinner ml-2 hidden"></span>
+                        </button>
+                        <button id="resetRoadmapBtn" class="ml-2 inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-charcoal-grey bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-self-made-teal">
+                            Reset
+                        </button>
+                    </div>
+                    <div id="personalizedRoadmapOutput" class="mt-6 p-4 bg-grey-green rounded-md border border-gray-200 text-charcoal-grey whitespace-pre-wrap text-sm min-h-[80px]">
+                        Your personalized AI roadmap will appear here.
+                    </div>
+                </div>
             </section>
 
         </main>
     </div>
+
+    <!-- Scroll Indicator -->
+    <div id="scroll-indicator" class="text-charcoal-grey">↓</div>
 
     <!-- Case Study Modal Structure -->
     <div id="caseStudyModalOverlay" class="modal-overlay hidden">
@@ -317,7 +470,8 @@
                 { name: 'Interview Question Assistant', category: 'interviewing', description: 'Generate tailored interview questions based on job roles or specific skills.', usp: 'Streamlines interview preparation with relevant questions.', type: 'ai-interview-questions' },
                 { name: 'Interview Feedback Summarizer', category: 'interviewing', description: 'Summarize interview notes, highlight strengths/weaknesses, and extract action items.', usp: 'Converts raw notes into structured, actionable feedback.', type: 'ai-feedback-summarizer' },
                 { name: 'Social Media Content Brainstormer', category: 'branding', description: 'Generate creative social media post ideas for employer branding based on a topic.', usp: 'Sparks creativity for engaging social media campaigns.', type: 'ai-social-brainstormer' },
-                { name: 'Candidate Outreach Personalizer', category: 'engagement', description: 'Generate personalized outreach messages for candidates based on their profile and the role.', usp: 'Boosts candidate response rates with tailored communication.', type: 'ai-outreach-personalizer' }
+                { name: 'Candidate Outreach Personalizer', category: 'engagement', description: 'Generate personalized outreach messages for candidates based on their profile and the role.', usp: 'Boosts candidate response rates with tailored communication.', type: 'ai-outreach-personalizer' },
+                { name: 'AI-Driven Role Impact Analyzer', category: 'market-insights', description: 'Understand how AI is transforming specific HR/TA roles. Get an AI-generated summary of how AI is likely to transform that role\'s responsibilities.', usp: 'Provides insights into the evolving nature of HR/TA roles due to AI.', type: 'ai-role-impact-analyzer' }
             ];
 
             const caseStudyData = [
@@ -378,6 +532,9 @@
             const modalTopline = document.getElementById('modalTopline');
             const modalDetails = document.getElementById('modalDetails');
 
+            // Scroll Indicator Element
+            // const scrollIndicator = document.getElementById('scroll-indicator'); // Removed duplicate declaration
+
 
             async function callGeminiAPI(prompt, outputElement, spinnerElement) {
                 outputElement.textContent = ''; // Clear previous output
@@ -386,7 +543,7 @@
                 let chatHistory = [];
                 chatHistory.push({ role: "user", parts: [{ text: prompt }] });
                 const payload = { contents: chatHistory };
-                const apiKey = ""; // Canvas will automatically provide this at runtime
+                const apiKey = "AIzaSyBtCRKq3UMXszLUEaAI9ZpTg9DzbPLoetY"; // Canvas will automatically provide this at runtime
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
                 let retryCount = 0;
@@ -441,7 +598,7 @@
                 
                 filteredTools.forEach(tool => {
                     const card = document.createElement('div');
-                    card.className = 'tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex flex-col fade-in';
+                    card.className = 'tool-card bg-white p-6 rounded-xl shadow-sm border border-robin-egg-teal flex flex-col fade-in';
                     card.innerHTML = `
                         <h3 class="text-xl font-bold text-charcoal-grey mb-2">${tool.name}</h3>
                         <p class="text-charcoal-grey text-sm mb-4 flex-grow">${tool.description}</p>
@@ -461,7 +618,7 @@
 
                 filteredAssistants.forEach(tool => {
                     const card = document.createElement('div');
-                    card.className = 'tool-card bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex flex-col fade-in';
+                    card.className = 'tool-card bg-white p-6 rounded-xl shadow-sm border border-robin-egg-teal flex flex-col fade-in';
                     
                     let innerHTMLContent = `<h3 class="text-xl font-bold text-charcoal-grey mb-2">✨ ${tool.name}</h3>
                                             <p class="text-charcoal-grey text-sm mb-4 flex-grow">${tool.description}</p>`;
@@ -560,6 +717,15 @@
                                 </div>
                             `;
                             break;
+                        case 'ai-role-impact-analyzer':
+                            inputId1 = `roleInput_${uniqueSuffix}`;
+                            innerHTMLContent += `
+                                <div class="mb-4">
+                                    <label for="${inputId1}" class="block text-sm font-medium text-charcoal-grey mb-2">HR/TA Role:</label>
+                                    <input type="text" id="${inputId1}" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-self-made-teal focus:ring-self-made-teal sm:text-sm p-2" placeholder="e.g., 'Recruiter', 'HR Business Partner', 'Talent Acquisition Manager'"/>
+                                </div>
+                            `;
+                            break;
                         default:
                             innerHTMLContent += `<p class="text-red-500">Unknown AI tool type.</p>`;
                     }
@@ -647,6 +813,10 @@
                                     const targetRole = input2El.value.trim();
                                     await callGeminiAPI(`Draft a personalized outreach message for a candidate with the following profile summary: "${profileSummary}". The message should be for the role of "${targetRole}". Make it engaging, highlight why their profile is a good fit, and include a clear call to action.`, currentOutput, currentSpinner);
                                     break;
+                                case 'ai-role-impact-analyzer':
+                                    promptText = input1El.value.trim();
+                                    await callGeminiAPI(`Analyze how the HR/TA role of "${promptText}" is being transformed by AI. Provide a summary of key changes in responsibilities and skills required, in 3-5 sentences.`, currentOutput, currentSpinner);
+                                    break;
                             }
                         });
                     }
@@ -715,7 +885,7 @@
                 interactiveCaseStudyGrid.innerHTML = '';
                 caseStudyData.forEach((study, index) => {
                     const card = document.createElement('div');
-                    card.className = 'case-study-card bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex flex-col cursor-pointer';
+                    card.className = 'case-study-card bg-white p-6 rounded-xl shadow-sm border border-robin-egg-teal flex flex-col cursor-pointer';
                     card.dataset.index = index; // Store index to retrieve full details
 
                     card.innerHTML = `
@@ -735,22 +905,31 @@
                         modalTopline.textContent = study.topline;
                         modalDetails.textContent = study.details; // Use textContent to prevent HTML injection
 
-                        caseStudyModalOverlay.classList.remove('hidden'); // Ensure it's not hidden
-                        caseStudyModalOverlay.classList.add('active');
+                        // Corrected modal display logic for animation
+                        caseStudyModalOverlay.classList.remove('hidden'); // Make it display:flex
+                        requestAnimationFrame(() => { // Wait for next frame to apply opacity/transform
+                            caseStudyModalOverlay.classList.add('active');
+                        });
                     });
                 });
             }
 
             // Close modal event listeners
             closeModalBtn.addEventListener('click', () => {
-                caseStudyModalOverlay.classList.remove('active');
-                caseStudyModalOverlay.classList.add('hidden'); // Hide it completely
+                caseStudyModalOverlay.classList.remove('active'); // Start fade-out/scale-down
+                caseStudyModalOverlay.addEventListener('transitionend', function handler() {
+                    caseStudyModalOverlay.classList.add('hidden'); // Hide completely after transition
+                    caseStudyModalOverlay.removeEventListener('transitionend', handler); // Remove listener to prevent multiple calls
+                }, { once: true }); // Use { once: true } for a cleaner listener removal
             });
 
             caseStudyModalOverlay.addEventListener('click', (e) => {
                 if (e.target === caseStudyModalOverlay) { // Only close if clicking on the overlay itself, not the content
-                    caseStudyModalOverlay.classList.remove('active');
-                    caseStudyModalOverlay.classList.add('hidden'); // Hide it completely
+                    caseStudyModalOverlay.classList.remove('active'); // Start fade-out/scale-down
+                    caseStudyModalOverlay.addEventListener('transitionend', function handler() {
+                        caseStudyModalOverlay.classList.add('hidden'); // Hide completely after transition
+                        caseStudyModalOverlay.removeEventListener('transitionend', handler); // Remove listener to prevent multiple calls
+                    }, { once: true }); // Use { once: true } for a cleaner listener removal
                 }
             });
 
@@ -897,6 +1076,127 @@
             renderHandsOnTools('all'); // Render hands-on tools by default (they are in a hidden section until navigated to)
             renderCaseStudiesHighlights(); // Render highlights for ROI & Impact section
             renderInteractiveCaseStudies(); // Render for the new Case Studies section
+
+            // Scroll indicator logic
+            const scrollIndicator = document.getElementById('scroll-indicator'); 
+            let scrollTimeout;
+
+            function checkScrollIndicator() {
+                // Only show if the document is actually scrollable
+                if (document.body.scrollHeight > window.innerHeight) {
+                    const scrollBottom = window.scrollY + window.innerHeight;
+                    const documentHeight = document.body.scrollHeight;
+                    const threshold = 150; // Pixels from bottom to hide indicator
+
+                    if (documentHeight - scrollBottom > threshold) {
+                        scrollIndicator.classList.add('visible');
+                        scrollIndicator.classList.remove('hidden-at-bottom');
+                    } else {
+                        scrollIndicator.classList.add('hidden-at-bottom');
+                        scrollIndicator.classList.remove('visible');
+                    }
+                } else {
+                    // If not scrollable, ensure it's hidden
+                    scrollIndicator.classList.remove('visible');
+                    scrollIndicator.classList.remove('hidden-at-bottom');
+                }
+            }
+
+            window.addEventListener('scroll', () => {
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(checkScrollIndicator, 100); // Debounce for performance
+            });
+
+            // Initial check on load
+            checkScrollIndicator();
+
+            // Smooth scroll when indicator is clicked
+            scrollIndicator.addEventListener('click', () => {
+                window.scrollBy({
+                    top: window.innerHeight * 0.8, // Scroll down by 80% of viewport height
+                    behavior: 'smooth'
+                });
+            });
+
+            // Personalized AI Roadmap Generator Logic
+            const teamSizeInput = document.getElementById('teamSizeInput');
+            const budgetInput = document.getElementById('budgetInput');
+            const painPointsInput = document.getElementById('painPointsInput');
+            const generateRoadmapBtn = document.getElementById('generateRoadmapBtn');
+            const resetRoadmapBtn = document.getElementById('resetRoadmapBtn');
+            const roadmapSpinner = document.getElementById('roadmapSpinner');
+            const personalizedRoadmapOutput = document.getElementById('personalizedRoadmapOutput');
+
+            generateRoadmapBtn.addEventListener('click', async () => {
+                const teamSize = teamSizeInput.value.trim();
+                const budget = budgetInput.value;
+                const painPoints = painPointsInput.value.trim();
+
+                if (!teamSize || !budget || !painPoints) {
+                    personalizedRoadmapOutput.textContent = 'Please fill in all fields to generate your roadmap.';
+                    roadmapSpinner.classList.add('hidden');
+                    return;
+                }
+
+                const prompt = `Generate a tailored, phased AI implementation roadmap for a Talent Acquisition team with the following characteristics:
+                - Current Team Size: ${teamSize}
+                - Approximate Budget for New Tech: ${budget}
+                - Top 2-3 Talent Acquisition Pain Points: ${painPoints}
+
+                The roadmap should include 3-5 key phases (e.g., Assessment, Pilot, Implementation, Optimization), with brief, actionable recommendations for each phase, specifically addressing the pain points and leveraging the budget/team size. Focus on practical steps for integrating AI in TA.`;
+
+                await callGeminiAPI(prompt, personalizedRoadmapOutput, roadmapSpinner);
+            });
+
+            resetRoadmapBtn.addEventListener('click', () => {
+                teamSizeInput.value = '';
+                budgetInput.value = '';
+                painPointsInput.value = '';
+                personalizedRoadmapOutput.textContent = 'Your personalized AI roadmap will appear here.';
+                roadmapSpinner.classList.add('hidden');
+            });
+
+            // AI Readiness Assessment Quiz Logic
+            const dataMaturitySelect = document.getElementById('dataMaturity');
+            const techStackIntegrationSelect = document.getElementById('techStackIntegration');
+            const orgCultureSelect = document.getElementById('orgCulture');
+            const topChallengeInput = document.getElementById('topChallenge');
+            const getReadinessAssessmentBtn = document.getElementById('getReadinessAssessmentBtn');
+            const resetReadinessQuizBtn = document.getElementById('resetReadinessQuizBtn');
+            const readinessSpinner = document.getElementById('readinessSpinner');
+            const readinessAssessmentOutput = document.getElementById('readinessAssessmentOutput');
+
+            getReadinessAssessmentBtn.addEventListener('click', async () => {
+                const dataMaturity = dataMaturitySelect.value;
+                const techStackIntegration = techStackIntegrationSelect.value;
+                const orgCulture = orgCultureSelect.value;
+                const topChallenge = topChallengeInput.value.trim();
+
+                if (!dataMaturity || !techStackIntegration || !orgCulture || !topChallenge) {
+                    readinessAssessmentOutput.textContent = 'Please answer all quiz questions to get your assessment.';
+                    readinessSpinner.classList.add('hidden');
+                    return;
+                }
+
+                const prompt = `Based on the following AI readiness assessment answers for a Talent Acquisition team:
+                - Data Maturity: ${dataMaturity}
+                - Tech Stack Integration: ${techStackIntegration}
+                - Organizational Culture: ${orgCulture}
+                - Top TA Challenge: ${topChallenge}
+
+                Provide a brief (3-5 sentences) AI readiness score (e.g., "Emerging," "Developing," "Advanced") and brief, actionable recommendations for next steps to improve AI adoption in their TA efforts.`;
+
+                await callGeminiAPI(prompt, readinessAssessmentOutput, readinessSpinner);
+            });
+
+            resetReadinessQuizBtn.addEventListener('click', () => {
+                dataMaturitySelect.value = '';
+                techStackIntegrationSelect.value = '';
+                orgCultureSelect.value = '';
+                topChallengeInput.value = '';
+                readinessAssessmentOutput.textContent = 'Your personalized AI readiness assessment will appear here.';
+                readinessSpinner.classList.add('hidden');
+            });
         });
     </script>
 </body>
